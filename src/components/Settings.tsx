@@ -1,7 +1,7 @@
 // src/components/Settings.tsx
 
 import React from 'react';
-import './styles.css'; // Import the CSS file
+
 
 const Settings: React.FC = () => {
   return (

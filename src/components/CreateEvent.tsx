@@ -2,7 +2,6 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { addDoc, collection } from "firebase/firestore";
 import EventForm from "./EventForm";
-import './styles.css'; // Import the combined CSS file
 
 const CreateEvent = ({ db }: { db: any }) => {
     const navigate = useNavigate();

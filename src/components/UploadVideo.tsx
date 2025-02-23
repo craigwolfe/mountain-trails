@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import './styles.css'; // Import the CSS file
+
 
 interface UploadVideoProps {
   storage: any;

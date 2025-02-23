@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import EventForm from "./EventForm";
-import './styles.css'; // Import the combined CSS file
+
 
 const EditEvent = ({ db }: { db: any }) => {
     const { id } = useParams();

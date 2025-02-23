@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getFirestore, collection, query, where, getDocs, doc, getDoc, updateDoc, arrayUnion, arrayRemove } from 'firebase/firestore';
-import './styles.css'; // Import the CSS file
-
+import { collection, query, where, getDocs, doc, getDoc, updateDoc, arrayUnion, arrayRemove } from 'firebase/firestore';
 interface FriendsProps {
     user: any;
     db: any;

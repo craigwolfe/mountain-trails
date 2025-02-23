@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { getFirestore, doc, getDoc, updateDoc, collection, getDocs, setDoc } from "firebase/firestore";
-import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import './styles.css'; // Import the combined CSS file
+import { doc, getDoc, updateDoc, setDoc } from "firebase/firestore";
+import {ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+
 
 interface ProfileProps {
     user: any;
@@ -9,7 +9,7 @@ interface ProfileProps {
     storage: any;
 }
 
-const Profile: React.FC<ProfileProps> = ({ user, db, storage }) => {
+const EditProfile: React.FC<ProfileProps> = ({ user, db, storage }) => {
     const [profileData, setProfileData] = useState<any>({ name: "", age: "", city: "", state: "", experience: "", photoURL: "", emailAddress: "" });
     const [file, setFile] = useState<any>(null);
 
@@ -25,7 +25,7 @@ const Profile: React.FC<ProfileProps> = ({ user, db, storage }) => {
             fetchProfile();
 
         }
-    }, [user]);
+    }, [db, user]);
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files[0]) {
@@ -66,8 +66,6 @@ const Profile: React.FC<ProfileProps> = ({ user, db, storage }) => {
             }
         }
     };
-
-
 
     return (
         <div className="master-container">
@@ -133,4 +131,4 @@ const Profile: React.FC<ProfileProps> = ({ user, db, storage }) => {
     );
 };
 
-export default Profile;
+export default EditProfile;

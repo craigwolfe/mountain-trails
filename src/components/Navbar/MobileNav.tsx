@@ -2,14 +2,14 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import './styles.css'; // Import the CSS file
+
 
 const MobileNav: React.FC = () => {
   return (
     <nav className="mobile-nav">
-      <Link to="/save-trail">
+      <Link to="/map">
         <i className="fas fa-mountain"></i>
-        <span>Trails</span>
+        <span>Routes</span>
       </Link>
       <Link to="/profile">
         <i className="fas fa-user"></i>

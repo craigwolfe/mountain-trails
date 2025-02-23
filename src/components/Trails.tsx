@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { collection, getDocs, query } from 'firebase/firestore';
-import './styles.css'; // Import the combined CSS file
+
 
 // Define the type for the props received by the Trails component
 interface TrailProps {
@@ -17,7 +17,7 @@ interface Trail {
     description: string;
     difficulty: string;
     userRating: number;
-    thumbnail: string;
+    thumbnail?: string; // Mark as optional to prevent issues if missing
 }
 
 const Trails: React.FC<TrailProps> = ({ db, user }) => {
@@ -43,7 +43,7 @@ const Trails: React.FC<TrailProps> = ({ db, user }) => {
                 // Loop through the query snapshot and process each document
                 querySnapshot.forEach((doc) => {
                     const data = doc.data();
-                    console.log(data); // Log document data
+                    //console.log(data); // Log document data
                     // Ensure the data is an object and not null
                     if (typeof data === 'object' && data !== null) {
                         // Add the document id and other data to the trailsData array
@@ -68,19 +68,25 @@ const Trails: React.FC<TrailProps> = ({ db, user }) => {
             <div className="listTrails">
                 <h1>Trails</h1>
                 {/* Render the list of trails */}
-                <ul>
-                    {trails.map((trail) => (
-                        <li key={trail.id} className="trail-item">
-                            <img src={trail.thumbnail} alt={trail.trailName} className="trail-thumbnail" />
-                            <div className="trail-info">
-                                <h2>{trail.trailName}</h2>
-                                <p><strong>Description:</strong> {trail.description}</p>
-                                <p><strong>Difficulty:</strong> {trail.difficulty}</p>
-                                <p><strong>User Rating:</strong> {trail.userRating} / 5</p>
-                            </div>
-                        </li>
-                    ))}
-                </ul>
+                {trails.length === 0 ? (
+                    <p>No scheduled events yet.</p>
+                ) : (
+                    <ul>
+                        {trails.map((trail) => (
+                            <li key={trail.id} className="trail-item">
+                                {trail.thumbnail && (
+                                    <img src={trail.thumbnail} alt={trail.trailName} className="trail-thumbnail" />
+                                )}
+                                <div className="trail-info">
+                                    <h2>{trail.trailName}</h2>
+                                    <p><strong>Description:</strong> {trail.description}</p>
+                                    <p><strong>Difficulty:</strong> {trail.difficulty}</p>
+                                    <p><strong>User Rating:</strong> {trail.userRating} / 5</p>
+                                </div>
+                            </li>
+                        ))}
+                    </ul>
+                )}
             </div>
         </div>
     );

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { doc, getDoc } from "firebase/firestore";
-import './styles.css'; // Import the combined CSS file
+
 
 const EventDetails = ({ db }: { db: any }) => {
     const { id } = useParams();

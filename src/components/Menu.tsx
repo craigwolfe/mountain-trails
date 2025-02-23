@@ -1,7 +1,6 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom'; // Use useNavigate in React Router v6
 import { getAuth, signOut } from 'firebase/auth'; // Import Firebase auth methods
-import './styles.css'; // Import the CSS file
 
 const Menu: React.FC = () => {
     const navigate = useNavigate(); // Hook for navigation after logging out
@@ -19,9 +18,12 @@ const Menu: React.FC = () => {
     return (
         <div className="master-container">
             <h1>Menu</h1>
-            <div className="menu-buttons">
+            <div>
                 <Link to="/events">
                     <button>Events</button>
+                </Link>
+                <Link to="/trails">
+                    <button>Trails</button>
                 </Link>
                 <Link to="/video">
                     <button>Video</button>
@@ -35,8 +37,8 @@ const Menu: React.FC = () => {
                 <Link to="/profile">
                     <button>Profile</button>
                 </Link>
-                <Link to="/save-trail">
-                    <button>Save Trail</button>
+                <Link to="/map">
+                    <button>Routes</button>
                 </Link>
                 <Link to="/create-account">
                     <button>Create Account</button>

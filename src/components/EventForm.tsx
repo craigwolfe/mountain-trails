@@ -1,9 +1,11 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getAuth } from "firebase/auth"; // Firebase Auth Import
-import './styles.css'; // Import the combined CSS file
 
-const EventForm = ({ initialData = {}, onSubmit }: { initialData?: any, onSubmit: (data: any) => any }) => {
+
+
+const EventForm = ({ initialData = {}, onSubmit }:
+    { initialData?: any, onSubmit: (data: any) => any }) => {
     const navigate = useNavigate();
     const auth = getAuth(); // Get Firebase Auth instance
     const user = auth.currentUser; // Get current logged-in user

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { signInWithEmailAndPassword, Auth } from "firebase/auth";
 import { useNavigate } from "react-router-dom"; // Import useNavigate
-import './styles.css'; // Import the CSS file
+
 //define component props, which include auth
 interface LoginProps {
     auth: Auth;
@@ -29,7 +29,7 @@ const Login: React.FC<LoginProps> = ({ auth }) => {
 
     return (
         <div className="master-container">
-            <h1>Login</h1>
+            <h2>Login</h2>
             <input
                 type="email"
                 placeholder="Email"
