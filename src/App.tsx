@@ -21,8 +21,6 @@ import MobileNav from './components/Navbar/MobileNav';
 import Notifications from './components/Notifications';
 import Profile from './components/Profile';
 import Settings from './components/Settings';
-//import TrailDetails from './components/TrailDetails';
-//import Trails from './components/Trails';
 import UploadVideo from './components/UploadVideo';
 import { auth, db, storage } from './firebase/firebaseconfig';
 

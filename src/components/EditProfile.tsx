@@ -69,7 +69,7 @@ const EditProfile: React.FC<ProfileProps> = ({ user, db, storage }) => {
 
     return (
         <div className="master-container">
-            <h1>Profile</h1>
+            <h1>Edit Profile</h1>
             {profileData.photoURL && <img className="avatar" src={profileData.photoURL} alt="Profile" />}
             {user ? (
                 <>
