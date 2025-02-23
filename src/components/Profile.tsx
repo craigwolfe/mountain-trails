@@ -1,80 +1,81 @@
-// src/components/Profile.tsx
+// Import necessary React hooks and Firebase functions
 import React, { useState, useEffect } from "react";
-//useState and useEffect are used to manage state and lifecycle effects.
-import {  doc, getDoc, updateDoc, collection, getDocs, setDoc } from "firebase/firestore";
-//getFirestore, doc, getDoc, updateDoc, collection, getDocs, and setDoc are used to interact with Firestore (database).
-import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-//getStorage, ref, uploadBytesResumable, getDownloadURL handle Firebase Storage operations for image uploads.
+import {
+    doc, getDoc, updateDoc, collection, getDocs, setDoc
+} from "firebase/firestore"; // Firestore methods
+import {
+    ref, uploadBytesResumable, getDownloadURL
+} from "firebase/storage"; // Firebase Storage methods
 
-//user: The authenticated user object, db: Firestore database instance, storage: Firebase Storage instance.
+// Define TypeScript interface for the component props
 interface ProfileProps {
-    user: any;
-    db: any;
-    storage: any;
+    user: any;     // User object (could be FirebaseAuth user)
+    db: any;       // Firestore database instance
+    storage: any;  // Firebase Storage instance
 }
-//This function is a React Functional Component that accepts ProfileProps.
+
+// Define the Profile component with the given props
 const Profile: React.FC<ProfileProps> = ({ user, db, storage }) => {
-    //State to hold user profile data, initialized with empty values.
-    const [profileData, setProfileData] = useState<any>({ name: "", age: "", city: "", state: "", experience: "", photoURL: "", emailAddress: "" });
-    //State for storing a selected file (profile picture before upload).
+    // State to store user profile data
+    const [profileData, setProfileData] = useState<any>({
+        name: "", age: "", city: "", state: "",
+        experience: "", photoURL: "", emailAddress: ""
+    });
+
+    // State for file upload (profile picture)
     const [file, setFile] = useState<any>(null);
-    //State for storing available routes retrieved from Firestore.
+
+    // State to store available routes from Firestore
     const [routes, setRoutes] = useState<any[]>([]);
-    //state for storing selected trails.
+
+    // State to store selected routes by the user
     const [selectedRoutes, setSelectedRoutes] = useState<string[]>([]);
-    //useEffect hook to fetch user profile data and available trails when the component mounts.
+
+    // Fetch user profile and available routes when the component mounts or when the user changes
     useEffect(() => {
-        //If a user is authenticated, fetch their profile data and selected trails.
         if (user) {
-            //Function to fetch user profile data from Firestore.
             const fetchProfile = async () => {
-                //Reference to the user's profile data document in Firestore.
-                const docRef = doc(db, "profileData", user.uid);
-                //Get the document snapshot from Firestore.
-                const docSnap = await getDoc(docRef);
-                //If the document exists, set the profile data and selected trails.
+                const docRef = doc(db, "profileData", user.uid); // Reference to user's profile doc
+                const docSnap = await getDoc(docRef); // Fetch the document
                 if (docSnap.exists()) {
-                    //Set the profile data state with the document data.
-                    setProfileData(docSnap.data());
-                    //Set the selected trails state with the document data or an empty array.
-                    setSelectedRoutes(docSnap.data().selectedRoutes || []);
+                    setProfileData(docSnap.data()); // Update state with user profile data
+                    setSelectedRoutes(docSnap.data().selectedRoutes || []); // Set selected routes
                 }
             };
-            //Call the fetchProfile function to retrieve user profile data.
             fetchProfile();
 
             const fetchRoutes = async () => {
-                const routesCollectionRef = collection(db, 'routes');
-                const routesSnapshot = await getDocs(routesCollectionRef);
-                const routesList = routesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                setRoutes(routesList);
+                const routesCollectionRef = collection(db, 'routes'); // Reference to routes collection
+                const routesSnapshot = await getDocs(routesCollectionRef); // Fetch all documents
+                const routesList = routesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })); // Convert to list
+                setRoutes(routesList); // Update state
             };
             fetchRoutes();
         }
-    }, [user]);//The useEffect hook runs when the user object changes.
+    }, [user]); // Runs when 'user' changes
 
-    //Function to handle file input change and store the selected file in state.
+    // Handle file selection for profile picture upload
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        //If a file is selected, set the file state with the first file in the list.
         if (e.target.files && e.target.files[0]) {
-            //Set the file state with the selected file.
-            setFile(e.target.files[0]);
+            setFile(e.target.files[0]); // Update state with selected file
         }
     };
 
+    // Upload profile picture to Firebase Storage
     const handleUpload = async () => {
-        if (!file || !user) return;
+        if (!file || !user) return; // Prevent upload if no file or user
 
-        const storageRef = ref(storage, `profile_pictures/${user.uid}`);
-        const uploadTask = uploadBytesResumable(storageRef, file);
+        const storageRef = ref(storage, `profile_pictures/${user.uid}`); // Storage reference
+        const uploadTask = uploadBytesResumable(storageRef, file); // Start upload
 
         uploadTask.on("state_changed", null, null, async () => {
-            const url = await getDownloadURL(uploadTask.snapshot.ref);
-            setProfileData(prev => ({ ...prev, photoURL: url }));
-            await updateDoc(doc(db, "profileData", user.uid), { photoURL: url });
+            const url = await getDownloadURL(uploadTask.snapshot.ref); // Get download URL
+            setProfileData(prev => ({ ...prev, photoURL: url })); // Update local state
+            await updateDoc(doc(db, "profileData", user.uid), { photoURL: url }); // Save in Firestore
         });
     };
 
+    // Save user profile data to Firestore
     const handleSaveProfile = async () => {
         if (user) {
             try {
@@ -87,9 +88,8 @@ const Profile: React.FC<ProfileProps> = ({ user, db, storage }) => {
                     photoURL: profileData.photoURL,
                     emailAddress: profileData.emailAddress,
                     selectedRoutes: selectedRoutes
-                },
-                    { merge: true });
-                    
+                }, { merge: true }); // Merge to avoid overwriting existing fields
+
                 alert('Profile saved successfully!');
             } catch (error) {
                 console.error('Error saving profile:', error);
@@ -98,17 +98,18 @@ const Profile: React.FC<ProfileProps> = ({ user, db, storage }) => {
         }
     };
 
+    // Handle selection of a route
     const handleRouteSelection = async (routeId: string) => {
-        const userDocRef = doc(db, "profileData", user.uid);
-        const selectedRouteRef = doc(collection(userDocRef, "selectedRoutes"), routeId);
-        const route = routes.find(t => t.id === routeId);
+        const userDocRef = doc(db, "profileData", user.uid); // Reference to user's profile document
+        const selectedRouteRef = doc(collection(userDocRef, "selectedRoutes"), routeId); // Reference to selected route
+        const route = routes.find(t => t.id === routeId); // Find the selected route
 
         if (route) {
-            await setDoc(selectedRouteRef, route);
+            await setDoc(selectedRouteRef, route); // Save the selected route in Firestore
             setSelectedRoutes(prevSelectedRoutes =>
                 prevSelectedRoutes.includes(routeId)
-                    ? prevSelectedRoutes.filter(id => id !== routeId)
-                    : [...prevSelectedRoutes, routeId]
+                    ? prevSelectedRoutes.filter(id => id !== routeId) // Remove if already selected
+                    : [...prevSelectedRoutes, routeId] // Add if not selected
             );
         }
     };
@@ -116,9 +117,13 @@ const Profile: React.FC<ProfileProps> = ({ user, db, storage }) => {
     return (
         <div className="form-container">
             <h1>Profile</h1>
+
+            {/* Display user profile picture if available */}
             {profileData.photoURL && <img className="avatar" src={profileData.photoURL} alt="Profile" width="100" />}
+
             {user ? (
                 <>
+                    {/* Profile input fields */}
                     <div className="form-group">
                         <label htmlFor="name">Name:</label>
                         <input
@@ -128,6 +133,7 @@ const Profile: React.FC<ProfileProps> = ({ user, db, storage }) => {
                             onChange={(e) => setProfileData({ ...profileData, name: e.target.value })}
                         />
                     </div>
+
                     <div className="form-group">
                         <label htmlFor="age">Age:</label>
                         <input
@@ -137,6 +143,7 @@ const Profile: React.FC<ProfileProps> = ({ user, db, storage }) => {
                             onChange={(e) => setProfileData({ ...profileData, age: e.target.value })}
                         />
                     </div>
+
                     <div className="form-group">
                         <label htmlFor="emailAddress">Email Address:</label>
                         <input
@@ -146,6 +153,7 @@ const Profile: React.FC<ProfileProps> = ({ user, db, storage }) => {
                             onChange={(e) => setProfileData({ ...profileData, emailAddress: e.target.value })}
                         />
                     </div>
+
                     <div className="form-group">
                         <label htmlFor="city">City:</label>
                         <input
@@ -155,6 +163,7 @@ const Profile: React.FC<ProfileProps> = ({ user, db, storage }) => {
                             onChange={(e) => setProfileData({ ...profileData, city: e.target.value })}
                         />
                     </div>
+
                     <div className="form-group">
                         <label htmlFor="state">State:</label>
                         <input
@@ -164,6 +173,8 @@ const Profile: React.FC<ProfileProps> = ({ user, db, storage }) => {
                             onChange={(e) => setProfileData({ ...profileData, state: e.target.value })}
                         />
                     </div>
+
+                    {/* Dropdown for selecting experience level */}
                     <div className="form-group">
                         <label htmlFor="experience">Experience:</label>
                         <select
@@ -176,6 +187,8 @@ const Profile: React.FC<ProfileProps> = ({ user, db, storage }) => {
                             <option value="Expert">Expert</option>
                         </select>
                     </div>
+
+                    {/* Routes selection */}
                     <h2>Completed Routes</h2>
                     <div className="completedRoutes">
                         {routes.map(route => (
@@ -188,11 +201,15 @@ const Profile: React.FC<ProfileProps> = ({ user, db, storage }) => {
                             </button>
                         ))}
                     </div>
+
+                    {/* File upload section */}
                     <div className="file-upload">
                         <hr className="separator" />
                         <input type="file" onChange={handleFileChange} />
                         <button onClick={handleUpload}>Upload Photo</button>
                     </div>
+
+                    {/* Save profile button */}
                     <div>
                         <hr className="separator" />
                         <button onClick={handleSaveProfile}>Save Profile</button>

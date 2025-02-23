@@ -5,6 +5,7 @@ import React, { useEffect, useState } from 'react';
 import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 import '../src/assets/styles/global.css';
 import MapPage from './components/Map/MapPage'; //import your map page
+import SaveButtonControl from './components/Map/SaveButtonControl'; //import your save button control
 import CreateAccount from './components/CreateAccount';
 import EditEvent from './components/EditEvent';
 import EditProfile from './components/EditProfile';
@@ -78,6 +79,8 @@ const App: React.FC = () => {
                    <Route path="/edit-profile" element={<EditProfile user={user} db={db} storage={storage} />} />  
                    <Route path="/event-form" element={<EventForm db={db} user={user} />} />   
                    <Route path="/map" element={<MapPage db={db} user={user} />} />
+                   <Route path="/save-button" element={<SaveButtonControl />} />
+             
                  
            </Routes>
            </div>
