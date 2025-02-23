@@ -6,6 +6,7 @@ import "leaflet-draw/dist/leaflet.draw.css";
 import { addDoc, collection, getDocs } from "firebase/firestore";
 import { db } from "../../firebase/firebaseconfig";
 import "../../assets/styles/global.css"; // Import the CSS file for styling
+import SaveButtonControl from "./SaveButtonControl";
 
 interface Route {
     type: string;
@@ -13,7 +14,6 @@ interface Route {
         type: string;
         coordinates: number[];
     };
-    properties?: Record<string, unknown>;
     name: string;
     description: string;
     elevationGain: number;
@@ -49,8 +49,9 @@ const MapPage: React.FC = () => {
             } catch (error) {
                 console.error("Error fetching routes:", error);
             }
+        
         };
-
+      
         fetchRoutes();
     }, []);
 
@@ -77,6 +78,7 @@ const MapPage: React.FC = () => {
         };
 
         setCurrentRoute(newRoute);
+        console.log("New route set:", newRoute);
     };
 
     const saveRoute = async () => {
@@ -86,9 +88,24 @@ const MapPage: React.FC = () => {
         }
 
         try {
-            const docRef = await addDoc(collection(db, "routes"), currentRoute);
+            const routeData = {
+                ...currentRoute,
+                name: routeName,
+                description: routeDescription,
+                elevationGain: routeElevationGain,
+                length: routeLength,
+                difficulty: routeDifficulty,
+                location: routeLocation,
+                rating: routeRating,
+                conditions: routeConditions,
+                safety: routeSafety,
+                userRating: routeUserRating,
+            };
+
+            const docRef = await addDoc(collection(db, "routes"), routeData);
             console.log("Route saved with ID:", docRef.id);
 
+            // Reset fields
             setCurrentRoute(null);
             setRouteName("");
             setRouteDescription("");
@@ -109,11 +126,7 @@ const MapPage: React.FC = () => {
 
     return (
         <div className="map-page-container">
-            <MapContainer
-                className="map-container"
-                center={[41.724487, -81.245659]}
-                zoom={13}
-            >
+            <MapContainer className="map-container" center={[41.724487, -81.245659]} zoom={13}>
                 <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
                 <FeatureGroup>
                     <EditControl
@@ -129,119 +142,57 @@ const MapPage: React.FC = () => {
                         }}
                     />
                 </FeatureGroup>
+                <SaveButtonControl />
             </MapContainer>
             <div className="form-container">
                 <div className="form-group">
                     <label htmlFor="routeName">Route Name:</label>
-                    <input
-                        type="text"
-                        id="routeName"
-                        value={routeName}
-                        onChange={(e) => setRouteName(e.target.value)}
-                        placeholder="Enter route name"
-                    />
+                    <input type="text" id="routeName" value={routeName} onChange={(e) => setRouteName(e.target.value)} />
                 </div>
 
                 <div className="form-group">
                     <label htmlFor="routeDescription">Route Description:</label>
-                    <textarea
-                        id="routeDescription"
-                        value={routeDescription}
-                        onChange={(e) => setRouteDescription(e.target.value)}
-                        placeholder="Enter route description"
-                    />
+                    <textarea id="routeDescription" value={routeDescription} onChange={(e) => setRouteDescription(e.target.value)} />
                 </div>
 
                 <div className="form-group">
-                    <label htmlFor="RouteElevationGain">Elevation Gain:</label>
-                    <input
-                        type="number"
-                        id="RouteElevationGain"
-                        value={routeElevationGain}
-                        onChange={(e) => setRouteElevationGain(Number(e.target.value))}
-                        placeholder="Enter elevation gain"
-                    />
+                    <label htmlFor="routeElevationGain">Elevation Gain:</label>
+                    <input type="number" id="routeElevationGain" value={routeElevationGain} onChange={(e) => setRouteElevationGain(Number(e.target.value))} />
                 </div>
 
                 <div className="form-group">
                     <label htmlFor="routeLength">Route Length:</label>
-                    <input
-                        type="number"
-                        id="routeLength"
-                        value={routeLength}
-                        onChange={(e) => setRouteLength(Number(e.target.value))}
-                        placeholder="Enter route length (mi)"
-                    />
+                    <input type="number" id="routeLength" value={routeLength} onChange={(e) => setRouteLength(Number(e.target.value))} />
                 </div>
 
                 <div className="form-group">
                     <label htmlFor="routeDifficulty">Route Difficulty:</label>
-                    <input
-                        type="text"
-                        id="routeDifficulty"
-                        value={routeDifficulty}
-                        onChange={(e) => setRouteDifficulty(e.target.value)}
-                        placeholder="Enter route difficulty"
-                    />
+                    <input type="text" id="routeDifficulty" value={routeDifficulty} onChange={(e) => setRouteDifficulty(e.target.value)} />
                 </div>
 
                 <div className="form-group">
                     <label htmlFor="routeLocation">Route Location:</label>
-                    <input
-                        type="text"
-                        id="routeLocation"
-                        value={routeLocation}
-                        onChange={(e) => setRouteLocation(e.target.value)}
-                        placeholder="Enter route location"
-                    />
+                    <input type="text" id="routeLocation" value={routeLocation} onChange={(e) => setRouteLocation(e.target.value)} />
                 </div>
 
                 <div className="form-group">
                     <label htmlFor="routeRating">Route Rating:</label>
-                    <input
-                        type="number"
-                        id="routeRating"
-                        value={routeRating}
-                        onChange={(e) => setRouteRating(Number(e.target.value))}
-                        placeholder="Enter route rating 1-5"
-                        min="1"
-                        max="5"
-                    />
+                    <input type="number" id="routeRating" value={routeRating} onChange={(e) => setRouteRating(Number(e.target.value))} />
                 </div>
 
                 <div className="form-group">
                     <label htmlFor="routeConditions">Route Conditions:</label>
-                    <input
-                        type="text"
-                        id="routeConditions"
-                        value={routeConditions}
-                        onChange={(e) => setRouteConditions(e.target.value)}
-                        placeholder="Enter route conditions: Dry, Muddy, Icey"
-                    />
+                    <input type="text" id="routeConditions" value={routeConditions} onChange={(e) => setRouteConditions(e.target.value)} />
                 </div>
 
                 <div className="form-group">
                     <label htmlFor="routeSafety">Route Safety:</label>
-                    <input
-                        type="text"
-                        id="routeSafety"
-                        value={routeSafety}
-                        onChange={(e) => setRouteSafety(e.target.value)}
-                        placeholder="Enter route safety"
-                    />
+                    <input type="text" id="routeSafety" value={routeSafety} onChange={(e) => setRouteSafety(e.target.value)} />
                 </div>
 
                 <div className="form-group">
                     <label htmlFor="routeUserRating">Route User Rating:</label>
-                    <input
-                        type="number"
-                        id="routeUserRating"
-                        value={routeUserRating}
-                        onChange={(e) => setRouteUserRating(Number(e.target.value))}
-                        placeholder="Enter route user rating 1-5"
-                        min="1"
-                        max="5"
-                    />
+                    <input type="number" id="routeUserRating" value={routeUserRating} onChange={(e) => setRouteUserRating(Number(e.target.value))} />
                 </div>
 
                 <hr className="separator" />
