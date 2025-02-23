@@ -80,8 +80,6 @@ const App: React.FC = () => {
                    <Route path="/event-form" element={<EventForm db={db} user={user} />} />   
                    <Route path="/map" element={<MapPage db={db} user={user} />} />
                    <Route path="/save-button" element={<SaveButtonControl />} />
-             
-                 
            </Routes>
            </div>
                <MobileNav/>
